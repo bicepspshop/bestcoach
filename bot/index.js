@@ -244,7 +244,7 @@ const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`🚀 BestCoach Bot запущен!`);
   console.log(`📱 Telegram Bot: активен`);
-  console.log(`🌐 Web App: http://localhost:3000`);
+  console.log(`🌐 Web App: ${WEB_APP_URL}`);
   console.log(`🗄️ Database: подключена`);
   console.log(`🔗 API: http://localhost:${PORT}`);
 });
