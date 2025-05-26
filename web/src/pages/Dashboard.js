@@ -2,12 +2,19 @@ import React, { useState, useEffect } from 'react';
 import { ApiService } from '../services/api';
 
 const Dashboard = ({ trainer }) => {
-  const [stats, setStats] = useState(null);
+  const [stats, setStats] = useState({
+    totalClients: 0,
+    activeClients: 0,
+    monthlyWorkouts: 0,
+    monthlyRevenue: 0
+  });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadDashboardData();
-  }, [trainer.id]);
+    if (trainer?.id) {
+      loadDashboardData();
+    }
+  }, [trainer]);
 
   const loadDashboardData = async () => {
     try {
@@ -15,7 +22,14 @@ const Dashboard = ({ trainer }) => {
       const statsData = await ApiService.getTrainerStats(trainer.id);
       setStats(statsData);
     } catch (error) {
-      console.error('Ошибка загрузки данных:', error);
+      console.error('Ошибка загрузки статистики:', error);
+      // Показываем тестовые данные в случае ошибки
+      setStats({
+        totalClients: 0,
+        activeClients: 0,
+        monthlyWorkouts: 0,
+        monthlyRevenue: 0
+      });
     } finally {
       setLoading(false);
     }
@@ -23,83 +37,159 @@ const Dashboard = ({ trainer }) => {
 
   if (loading) {
     return (
-      <div className="container py-6">
-        <div className="flex items-center justify-center py-12">
-          <div className="loader"></div>
+      <div className="app-container">
+        <div className="content-container">
+          <div className="loading-container">
+            <div className="spinner"></div>
+            <div className="loading-text">Загрузка панели...</div>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="container py-6 space-y-6">
-      {/* Заголовок */}
-      <div className="">
-        <h1 className="text-2xl font-bold mb-2">Главная панель</h1>
-        <p className="text-gray-500">
-          Добро пожаловать в фитнес-помощник!
-        </p>
-      </div>
+    <div className="app-container">
+      <div className="content-container fade-in">
+        {/* Заголовок */}
+        <div className="mb-6">
+          <h1 className="page-title">
+            Добро пожаловать, {trainer?.first_name || 'Тренер'}! 👋
+          </h1>
+          <p className="page-subtitle">
+            Управляйте своими клиентами и тренировками
+          </p>
+        </div>
 
-      {/* Быстрые действия */}
-      <div className="grid grid-cols-2 gap-4">
-        <div className="card p-4 text-center hover:shadow-lg transition-shadow">
-          <div className="flex flex-col items-center">
-            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-3">
-              <span className="text-blue-600 text-2xl">+</span>
-            </div>
-            <span className="font-medium">Добавить клиента</span>
+        {/* Статистика */}
+        <div className="stats-grid">
+          <div className="stat-card slide-up">
+            <div className="stat-icon primary">👥</div>
+            <div className="stat-value">{stats.totalClients}</div>
+            <div className="stat-label">Всего клиентов</div>
+          </div>
+          
+          <div className="stat-card slide-up">
+            <div className="stat-icon success">🏋️</div>
+            <div className="stat-value">{stats.monthlyWorkouts}</div>
+            <div className="stat-label">Тренировок в месяц</div>
+          </div>
+          
+          <div className="stat-card slide-up">
+            <div className="stat-icon warning">💰</div>
+            <div className="stat-value">{stats.monthlyRevenue.toLocaleString()}₽</div>
+            <div className="stat-label">Доход за месяц</div>
+          </div>
+          
+          <div className="stat-card slide-up">
+            <div className="stat-icon info">📅</div>
+            <div className="stat-value">{new Date().getDate()}</div>
+            <div className="stat-label">Сегодня</div>
           </div>
         </div>
-        
-        <div className="card p-4 text-center hover:shadow-lg transition-shadow">
-          <div className="flex flex-col items-center">
-            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-3">
-              <span className="text-green-600 text-2xl">📅</span>
-            </div>
-            <span className="font-medium">Запланировать тренировку</span>
-          </div>
-        </div>
-      </div>
 
-      {/* Статистика */}
-      <div className="grid grid-cols-2 gap-4">
-        <div className="card p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-500">Клиенты</p>
-              <p className="text-2xl font-bold">{stats?.activeClients || 0}</p>
+        {/* Быстрые действия */}
+        <div className="card card-gradient">
+          <div className="card-header">
+            <h2 className="section-title">Быстрые действия</h2>
+          </div>
+          <div className="card-body">
+            <div className="quick-actions">
+              <button 
+                className="action-card"
+                onClick={() => window.location.hash = '#/clients'}
+              >
+                <span className="action-icon">👤</span>
+                <div className="action-title">Добавить клиента</div>
+              </button>
+              
+              <button 
+                className="action-card"
+                onClick={() => window.location.hash = '#/workouts'}
+              >
+                <span className="action-icon">📅</span>
+                <div className="action-title">Запланировать тренировку</div>
+              </button>
             </div>
-            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-              <span className="text-blue-600">👥</span>
-            </div>
+            
+            <button 
+              className="btn btn-primary btn-full btn-lg"
+              onClick={() => window.location.hash = '#/clients'}
+            >
+              <span>🚀</span>
+              Начать работу
+            </button>
           </div>
         </div>
-        
-        <div className="card p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-500">Аналитика</p>
-              <p className="text-2xl font-bold">{stats?.completionRate || 0}%</p>
-            </div>
-            <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-              <span className="text-purple-600">📊</span>
-            </div>
-          </div>
-        </div>
-      </div>
 
-      {/* Расписание на сегодня */}
-      <div className="card">
-        <div className="card-header">
-          <h2 className="text-lg font-semibold">Расписание на сегодня</h2>
-        </div>
-        <div className="card-body">
-          <div className="text-center py-8">
-            <span className="text-gray-300 text-4xl">📅</span>
-            <p className="text-gray-500 mt-4">На сегодня тренировок не запланировано</p>
+        {/* Последние клиенты */}
+        <div className="card">
+          <div className="card-header">
+            <div className="flex justify-between items-center">
+              <h2 className="section-title">Последние клиенты</h2>
+              <button 
+                className="btn btn-outline btn-sm"
+                onClick={() => window.location.hash = '#/clients'}
+              >
+                Все клиенты
+              </button>
+            </div>
+          </div>
+          <div className="card-body">
+            {stats.totalClients === 0 ? (
+              <div className="empty-state">
+                <div className="empty-icon">👥</div>
+                <div className="empty-title">Пока нет клиентов</div>
+                <div className="empty-description">
+                  Добавьте первого клиента для начала работы
+                </div>
+                <button 
+                  className="btn btn-primary"
+                  onClick={() => window.location.hash = '#/clients'}
+                >
+                  Добавить клиента
+                </button>
+              </div>
+            ) : (
+              <div className="text-center p-4">
+                <p className="text-gray-600">Клиенты будут отображаться здесь</p>
+              </div>
+            )}
           </div>
         </div>
+
+        {/* Сегодняшние тренировки */}
+        <div className="card">
+          <div className="card-header">
+            <div className="flex justify-between items-center">
+              <h2 className="section-title">Тренировки сегодня</h2>
+              <button 
+                className="btn btn-outline btn-sm"
+                onClick={() => window.location.hash = '#/workouts'}
+              >
+                Все тренировки
+              </button>
+            </div>
+          </div>
+          <div className="card-body">
+            <div className="empty-state">
+              <div className="empty-icon">📅</div>
+              <div className="empty-title">Нет тренировок на сегодня</div>
+              <div className="empty-description">
+                Запланируйте тренировки с клиентами
+              </div>
+              <button 
+                className="btn btn-success"
+                onClick={() => window.location.hash = '#/workouts'}
+              >
+                Запланировать тренировку
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Нижний отступ для навигации */}
+        <div style={{ height: '80px' }}></div>
       </div>
     </div>
   );
