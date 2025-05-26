@@ -1,0 +1,1 @@
+import React from 'react';\n\nconst LoadingSpinner = ({ size = 'md', className = '' }) => {\n  const sizeClasses = {\n    sm: 'w-4 h-4',\n    md: 'w-6 h-6', \n    lg: 'w-8 h-8',\n    xl: 'w-12 h-12'\n  };\n\n  return (\n    <div className={`${sizeClasses[size]} ${className}`}>\n      <div className=\"loader\"></div>\n    </div>\n  );\n};\n\nexport default LoadingSpinner;

@@ -1,0 +1,31 @@
+{
+  "name": "bestcoach-fitness-assistant",
+  "version": "1.0.0",
+  "description": "Telegram bot и веб-приложение для фитнес-тренеров",
+  "main": "bot/index.js",
+  "scripts": {
+    "start": "node bot/index.js",
+    "dev": "nodemon bot/index.js",
+    "web": "cd web && npm start",
+    "build": "cd web && npm run build",
+    "setup-db": "node database/setup.js"
+  },
+  "dependencies": {
+    "node-telegram-bot-api": "^0.66.0",
+    "@supabase/supabase-js": "^2.39.0",
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "uuid": "^9.0.1",
+    "multer": "^1.4.5-lts.1",
+    "sharp": "^0.33.0",
+    "node-cron": "^3.0.3",
+    "moment": "^2.29.4"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "keywords": ["telegram", "fitness", "trainer", "supabase"],
+  "author": "BestCoach Team",
+  "license": "MIT"
+}
