@@ -23,6 +23,17 @@ export class ApiService {
     return data;
   }
 
+  static async createTrainer(trainerData) {
+    const { data, error } = await supabase
+      .from('trainers')
+      .insert([trainerData])
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return data;
+  }
+
   static async updateTrainer(id, data) {
     const { data: result, error } = await supabase
       .from('trainers')

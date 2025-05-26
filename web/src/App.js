@@ -37,20 +37,35 @@ function App() {
       }
 
       // Получаем данные тренера
-      const trainerData = await ApiService.getTrainerByTelegramId(telegramId);
+      let trainerData = await ApiService.getTrainerByTelegramId(telegramId);
       
       if (!trainerData) {
-        // Создаем тестового тренера для демонстрации
-        setTrainer({
-          id: 'test-trainer-id',
+        // Создаем нового тренера в базе данных
+        const newTrainerData = {
           telegram_id: telegramId,
-          first_name: 'Тест',
-          last_name: 'Тренер',
-          email: 'test@example.com'
-        });
-      } else {
-        setTrainer(trainerData);
+          first_name: window.Telegram?.WebApp?.initDataUnsafe?.user?.first_name || 'Тренер',
+          last_name: window.Telegram?.WebApp?.initDataUnsafe?.user?.last_name || '',
+          username: window.Telegram?.WebApp?.initDataUnsafe?.user?.username || null,
+          is_active: true
+        };
+        
+        try {
+          trainerData = await ApiService.createTrainer(newTrainerData);
+          console.log('Создан новый тренер:', trainerData);
+        } catch (createError) {
+          console.error('Ошибка создания тренера:', createError);
+          // Fallback - используем временного тренера
+          trainerData = {
+            id: `temp-${telegramId}`,
+            telegram_id: telegramId,
+            first_name: newTrainerData.first_name,
+            last_name: newTrainerData.last_name,
+            is_active: true
+          };
+        }
       }
+      
+      setTrainer(trainerData);
       
     } catch (err) {
       console.error('Ошибка инициализации:', err);
